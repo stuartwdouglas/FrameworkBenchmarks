@@ -75,49 +75,10 @@ public final class HelloWebServer {
         properties.getProperty("postgresql.uri"),
         properties.getProperty("postgresql.user"),
         properties.getProperty("postgresql.password"));
-    final DB mongodb = new MongoClient(properties.getProperty("mongodb.host"))
-        .getDB(properties.getProperty("mongodb.name"));
-    //
-    // The world cache is primed at startup with all values.  It doesn't
-    // matter which database backs it; they all contain the same information
-    // and the CacheLoader.load implementation below is never invoked.
-    //
-    final LoadingCache<Integer, World> worldCache = CacheBuilder.newBuilder()
-        .build(new CacheLoader<Integer, World>() {
-          @Override
-          public World load(Integer id) throws Exception {
-            try (Connection connection = mysql.getConnection();
-                 PreparedStatement statement = connection.prepareStatement(
-                     "SELECT * FROM World WHERE id = ?",
-                     ResultSet.TYPE_FORWARD_ONLY,
-                     ResultSet.CONCUR_READ_ONLY)) {
-              statement.setInt(1, id);
-              try (ResultSet resultSet = statement.executeQuery()) {
-                resultSet.next();
-                return new World(
-                    resultSet.getInt("id"),
-                    resultSet.getInt("randomNumber"));
-              }
-            }
-          }
-        });
-    try (Connection connection = mysql.getConnection();
-         PreparedStatement statement = connection.prepareStatement(
-             "SELECT * FROM World",
-             ResultSet.TYPE_FORWARD_ONLY,
-             ResultSet.CONCUR_READ_ONLY);
-         ResultSet resultSet = statement.executeQuery()) {
-      while (resultSet.next()) {
-        World world = new World(
-            resultSet.getInt("id"),
-            resultSet.getInt("randomNumber"));
-        worldCache.put(world.id, world);
-      }
-    }
+
     Undertow.builder()
         .addHttpListener(
-            Integer.parseInt(properties.getProperty("web.port")),
-            properties.getProperty("web.host"))
+            Integer.parseInt(properties.getProperty("web.port")),"192.168.1.4")
         .setBufferSize(1024 * 16)
         .setIoThreads(Runtime.getRuntime().availableProcessors() * 2) //this seems slightly faster in some configurations
         .setSocketOption(Options.BACKLOG, 10000)
@@ -134,26 +95,16 @@ public final class HelloWebServer {
                 new DbSqlHandler(objectMapper, postgresql, false))
             .addPrefixPath("/queries/postgresql",
                 new DbSqlHandler(objectMapper, postgresql, true))
-            .addPrefixPath("/db/mongodb",
-                new DbMongoHandler(objectMapper, mongodb, false))
-            .addPrefixPath("/queries/mongodb",
-                new DbMongoHandler(objectMapper, mongodb, true))
             .addPrefixPath("/fortunes/mysql",
                 new FortunesSqlHandler(mustacheFactory, mysql))
             .addPrefixPath("/fortunes/postgresql",
                 new FortunesSqlHandler(mustacheFactory, postgresql))
-            .addPrefixPath("/fortunes/mongodb",
-                new FortunesMongoHandler(mustacheFactory, mongodb))
             .addPrefixPath("/updates/mysql",
                 new UpdatesSqlHandler(objectMapper, mysql))
             .addPrefixPath("/updates/postgresql",
                 new UpdatesSqlHandler(objectMapper, postgresql))
-            .addPrefixPath("/updates/mongodb",
-                new UpdatesMongoHandler(objectMapper, mongodb))
             .addPrefixPath("/plaintext",
-                new PlaintextHandler())
-            .addPrefixPath("/cache",
-                new CacheHandler(objectMapper, worldCache)),
+                new PlaintextHandler()),
             Headers.SERVER_STRING, "U-tow"))
         .setWorkerThreads(200)
         .build()

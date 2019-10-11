@@ -200,6 +200,12 @@ def main(argv=None):
         default=None,
         help='The network mode to run docker in')
 
+    # CPU set  options
+    parser.add_argument(
+        '--cpuset_cpus',
+        default=None,
+        help='The cpu set to run framework container on')
+
     args = parser.parse_args()
 
     config = BenchmarkConfig(args)

@@ -198,6 +198,14 @@ class DockerHelper:
                 'soft': 99
             }]
 
+            cpuset_cpus = ''
+
+            if self.benchmarker.config.cpuset_cpus is not None:
+                cpuset_cpus = self.benchmarker.config.cpuset_cpus
+
+            log("Running docker container with cpu set: %s" %
+                                cpuset_cpus)
+
             docker_cmd = ''
             if hasattr(test, 'docker_cmd'):
                 docker_cmd = test.docker_cmd
@@ -223,7 +231,8 @@ class DockerHelper:
                 mem_limit=mem_limit,
                 sysctls=sysctl,
                 remove=True,
-                log_config={'type': None})
+                log_config={'type': None},
+                cpuset_cpus=cpuset_cpus)
 
             watch_thread = Thread(
                 target=watch_container,

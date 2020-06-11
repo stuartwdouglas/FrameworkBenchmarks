@@ -68,8 +68,31 @@ public class WorldRepository {
         }
     }
 
+    public Collection<World> find(Set<Integer> ids) {
+        try (Session s = sf.openSession()) {
+            return find(s, ids);
+        }
+    }
+
+    public Collection<World> find(Session s, Set<Integer> ids) {
+        //The rules require individual load: we can't use the Hibernate feature which allows load by multiple IDs as one single operation
+        ArrayList l = new ArrayList<>(ids.size());
+        for (Integer id : ids) {
+            l.add(singleWorldLoad(s,id));
+        }
+        return l;
+    }
+
     private static World singleStatelessWorldLoad(final StatelessSession ss, final Integer id) {
         return (World) ss.get(World.class, id);
+    }
+
+    private static World singleWorldLoad(final Session ss, final Integer id) {
+        return (World) ss.find(World.class, id);
+    }
+
+    public Session openSession() {
+        return sf.openSession();
     }
 
 }

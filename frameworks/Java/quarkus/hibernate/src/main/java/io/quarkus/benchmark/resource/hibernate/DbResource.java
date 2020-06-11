@@ -16,6 +16,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
+
 
 @Singleton
 @Path("/")
@@ -51,17 +54,20 @@ public class DbResource {
     // all other tested frameworks seem to do.
     public World[] updates(@QueryParam("queries") String queries) {
         final int count = parseQueryCount(queries);
-        final Collection<World> worlds = randomWorldForRead(count);
-        worlds.forEach( w -> {
-            //Read the one field, as required by the following rule:
-            // # vi. At least the randomNumber field must be read from the database result set.
-            final int previousRead = w.getRandomNumber();
-            //Update it, but make sure to exclude the current number as Hibernate optimisations would have us "fail"
-            //the verification:
-            w.setRandomNumber(randomWorldNumber(previousRead));
-        } );
-        worldRepository.updateAll(worlds);
-        return worlds.toArray(new World[0]);
+        try(Session session = worldRepository.openSession()){
+            session.setHibernateFlushMode(FlushMode.MANUAL);
+            final Collection<World> worlds = randomWorldForUpdate(session, count);
+            worlds.forEach( w -> {
+                //Read the one field, as required by the following rule:
+                // # vi. At least the randomNumber field must be read from the database result set.
+                final int previousRead = w.getRandomNumber();
+                //Update it, but make sure to exclude the current number as Hibernate optimisations would have us "fail"
+                //the verification:
+                w.setRandomNumber(randomWorldNumber(previousRead));
+            } );
+            session.flush();
+            return worlds.toArray(new World[0]);
+        }
     }
 
     @GET
@@ -81,7 +87,16 @@ public class DbResource {
         while (counter < count) {
             counter += ids.add(Integer.valueOf(randomWorldNumber())) ? 1 : 0;
         }
-        return worldRepository.findReadonly(ids);
+        return worldRepository.find(ids);
+    }
+
+    private Collection<World> randomWorldForUpdate(Session session, int count) {
+        Set<Integer> ids = new HashSet<>(count);
+        int counter = 0;
+        while (counter < count) {
+            counter += ids.add(Integer.valueOf(randomWorldNumber())) ? 1 : 0;
+        }
+        return worldRepository.find(session, ids);
     }
 
     /**

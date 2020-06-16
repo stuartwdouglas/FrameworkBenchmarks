@@ -10,7 +10,7 @@ import io.quarkus.vertx.web.RouteFilter;
 import io.vertx.ext.web.RoutingContext;
 
 @Singleton
-public class ServerHeaderFilter {
+public class    ServerHeaderFilter {
 
     private String date;
 

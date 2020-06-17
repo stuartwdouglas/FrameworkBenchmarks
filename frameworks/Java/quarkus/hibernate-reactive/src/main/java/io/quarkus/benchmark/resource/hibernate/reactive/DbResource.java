@@ -12,7 +12,7 @@ import org.hibernate.FlushMode;
 import org.hibernate.reactive.mutiny.Mutiny;
 
 import io.quarkus.benchmark.model.hibernate.reactive.World;
-import io.quarkus.benchmark.repository.hibernate.reactive.WorldRepository;
+import io.quarkus.benchmark.repository.hibernate.reactive.WorldRepositoryMutiny;
 import io.quarkus.vertx.web.Route;
 import io.smallrye.mutiny.Uni;
 import io.vertx.ext.web.RoutingContext;
@@ -22,7 +22,7 @@ import io.vertx.ext.web.RoutingContext;
 public class DbResource extends BaseResource {
 
     @Inject
-    WorldRepository worldRepository;
+    WorldRepositoryMutiny worldRepository;
 
     @Route(path = "db")
     public void db(RoutingContext rc) {

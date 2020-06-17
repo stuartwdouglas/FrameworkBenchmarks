@@ -12,7 +12,7 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 
 import io.quarkus.benchmark.model.hibernate.reactive.Fortune;
-import io.quarkus.benchmark.repository.hibernate.reactive.FortuneRepository;
+import io.quarkus.benchmark.repository.hibernate.reactive.FortuneRepositoryMutiny;
 import io.quarkus.vertx.web.Route;
 import io.vertx.ext.web.RoutingContext;
 
@@ -20,7 +20,7 @@ import io.vertx.ext.web.RoutingContext;
 public class FortuneResource extends BaseResource {
 
     @Inject
-    FortuneRepository repository;
+    FortuneRepositoryMutiny repository;
 
     private final Mustache template;
 

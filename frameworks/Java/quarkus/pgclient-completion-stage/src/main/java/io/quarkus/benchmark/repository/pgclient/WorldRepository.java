@@ -2,7 +2,6 @@ package io.quarkus.benchmark.repository.pgclient;
 
 import io.quarkus.benchmark.model.World;
 import io.reactivex.Single;
-import io.vertx.core.AsyncResult;
 import io.vertx.reactivex.impl.AsyncResultSingle;
 import io.vertx.reactivex.sqlclient.Row;
 import io.vertx.reactivex.sqlclient.RowSet;
@@ -10,7 +9,6 @@ import io.vertx.reactivex.sqlclient.Tuple;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.concurrent.CompletableFuture;
 
 @ApplicationScoped
 public class WorldRepository {

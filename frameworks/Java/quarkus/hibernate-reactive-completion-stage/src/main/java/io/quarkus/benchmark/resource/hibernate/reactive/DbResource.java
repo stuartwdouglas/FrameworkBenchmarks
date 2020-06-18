@@ -17,7 +17,7 @@ public class DbResource extends BaseResource {
     @Inject
     WorldRepository worldRepository;
 
-    @Route(path = "dbCompletion")
+    @Route(path = "db")
     public void db(RoutingContext rc) {
         randomWorld().thenAccept(world -> sendJson(rc, world));
 

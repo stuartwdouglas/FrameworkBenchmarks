@@ -3,8 +3,11 @@ WORKDIR /quarkus
 COPY pom.xml pom.xml
 COPY base/pom.xml base/pom.xml
 COPY hibernate/pom.xml hibernate/pom.xml
+COPY hibernate-event-loop/pom.xml hibernate-event-loop/pom.xml
 COPY hibernate-reactive/pom.xml hibernate-reactive/pom.xml
+COPY hibernate-reactive-completion-stage/pom.xml hibernate-reactive-completion-stage/pom.xml
 COPY pgclient/pom.xml pgclient/pom.xml
+COPY pgclient-completion-stage/pom.xml pgclient-completion-stage/pom.xml
 
 RUN mkdir -p /root/.m2/repository/io
 COPY m2-quarkus /root/.m2/repository/io/quarkus
@@ -13,8 +16,11 @@ RUN mvn dependency:go-offline -q -pl base
 
 COPY base/src base/src
 COPY hibernate/src hibernate/src
+COPY hibernate-event-loop/src hibernate-event-loop/src
 COPY hibernate-reactive/src hibernate-reactive/src
+COPY hibernate-reactive-completion-stage/src hibernate-reactive-completion-stage/src
 COPY pgclient/src pgclient/src
+COPY pgclient-completion-stage/src pgclient-completion-stage/src
 
 RUN mvn package -q -pl hibernate-event-loop -am
 

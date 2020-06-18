@@ -14,7 +14,7 @@ COPY m2-quarkus /root/.m2/repository/io/quarkus
 
 RUN mvn dependency:go-offline -q -pl base
 
-COPY base/src base/src
+COPY base/src/main/resources base/src/main/resources
 COPY hibernate/src hibernate/src
 COPY hibernate-event-loop/src hibernate-event-loop/src
 COPY hibernate-reactive/src hibernate-reactive/src
@@ -22,10 +22,10 @@ COPY hibernate-reactive-completion-stage/src hibernate-reactive-completion-stage
 COPY pgclient/src pgclient/src
 COPY pgclient-completion-stage/src pgclient-completion-stage/src
 
-RUN mvn package -q -pl hibernate-reactive -am
+RUN mvn package -q -pl pgclient-completion-stage -am
 
 FROM openjdk:11.0.6-jdk-slim
 WORKDIR /quarkus
-COPY --from=maven /quarkus/hibernate-reactive/target/lib lib
-COPY --from=maven /quarkus/hibernate-reactive/target/hibernate-reactive-1.0-SNAPSHOT-runner.jar app.jar
+COPY --from=maven /quarkus/pgclient-completion-stage/target/lib lib
+COPY --from=maven /quarkus/pgclient-completion-stage/target/pgclient-completion-stage-1.0-SNAPSHOT-runner.jar app.jar
 CMD ["java", "-server", "-XX:+UseNUMA", "-XX:+UseParallelGC", "-Djava.lang.Integer.IntegerCache.high=10000", "-Dvertx.disableHttpHeadersValidation=true", "-Dvertx.disableMetrics=true", "-Dvertx.disableH2c=true", "-Dvertx.disableWebsockets=true", "-Dvertx.flashPolicyHandler=false", "-Dvertx.threadChecks=false", "-Dvertx.disableContextTimings=true", "-Dvertx.disableTCCL=true", "-Dhibernate.allow_update_outside_transaction=true", "-Djboss.threads.eqe.statistics=false", "-jar", "app.jar"]

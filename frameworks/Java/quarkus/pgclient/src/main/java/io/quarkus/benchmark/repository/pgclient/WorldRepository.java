@@ -32,7 +32,7 @@ public class WorldRepository {
         for(World world : worlds) {
             args.add(Tuple.of(world.getId(), world.getRandomNumber()));
         }
-        return clients.getPool().preparedQuery("UPDATE World SET randomNumber = $2 WHERE id = $1").executeBatch(args)
+        return clients.getClient().preparedQuery("UPDATE World SET randomNumber = $2 WHERE id = $1").executeBatch(args)
                 .map(v -> null);
     }
 }

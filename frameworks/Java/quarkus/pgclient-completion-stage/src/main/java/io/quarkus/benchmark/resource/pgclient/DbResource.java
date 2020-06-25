@@ -59,7 +59,7 @@ public class DbResource extends BaseResource {
 //    }
 
     private Single<World> randomWorld() {
-        return worldRepository.find(randomWorldNumber());
+        return worldRepository.findSingle(randomWorldNumber());
     }
 
     private int randomWorldNumber() {

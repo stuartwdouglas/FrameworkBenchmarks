@@ -1,17 +1,15 @@
 package io.quarkus.benchmark.resource.pgclient;
 
-import java.util.Arrays;
-import java.util.concurrent.ThreadLocalRandom;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import io.quarkus.benchmark.model.World;
 import io.quarkus.benchmark.repository.pgclient.WorldRepository;
 import io.quarkus.vertx.web.Route;
 import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.groups.UniAndGroupIterable;
 import io.vertx.ext.web.RoutingContext;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 @ApplicationScoped

@@ -29,13 +29,16 @@ public class PgClientFactory {
 	@ConfigProperty(name = "quarkus.datasource.password")
 	String pass;
 
+	@ConfigProperty(name = "reactive.pool.size")
+	String reactivePoolSize;
+
 	@Inject
 	Vertx vertx;
 
 	@Produces
 	@ApplicationScoped
 	public PgClients pgClients() {
-	    return new PgClients(this);
+	    return new PgClients(this, Integer.valueOf(reactivePoolSize));
 	}
 
 

@@ -19,7 +19,7 @@
         <module>hibernate</module>
         <module>hibernate-event-loop</module>
         <module>hibernate-reactive</module>
-        <module>hibernate-reactive-agroal</module>
+			<!--        <module>hibernate-reactive-agroal</module>-->
         <module>hibernate-reactive-completion-stage</module>
         <module>hibernate-reactive-routes-blocking</module>
         <module>pgclient</module>

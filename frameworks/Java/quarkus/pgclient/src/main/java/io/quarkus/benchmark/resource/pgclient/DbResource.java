@@ -2,62 +2,24 @@ package io.quarkus.benchmark.resource.pgclient;
 
 import io.quarkus.benchmark.model.World;
 import io.quarkus.benchmark.repository.pgclient.WorldRepository;
-import io.quarkus.vertx.web.Route;
 import io.smallrye.mutiny.Uni;
 import io.vertx.ext.web.RoutingContext;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.Arrays;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import java.util.concurrent.ThreadLocalRandom;
 
 
-@ApplicationScoped
+@Path("/db")
 public class DbResource extends BaseResource {
 
     @Inject
     WorldRepository worldRepository;
 
-    @Route(path = "db")
-    public void db(RoutingContext rc) {
-        randomWorld().subscribe().with(world -> sendJson(rc, world),
-                                       t -> handleFail(rc, t));
-    }
-
-    @Route(path = "queries")
-    public void queries(RoutingContext rc) {
-        var queries = rc.request().getParam("queries");
-        var worlds = new Uni[parseQueryCount(queries)];
-        var ret = new World[worlds.length];
-        Arrays.setAll(worlds, i -> {
-            return randomWorld().map(w -> ret[i] = w);
-        });
-
-        Uni.combine().all().unis(worlds)
-        .combinedWith(v -> Arrays.asList(ret))
-        .subscribe().with(list -> sendJson(rc, list),
-                          t -> handleFail(rc, t));
-    }
-
-    @Route(path = "updates")
-    public void updates(RoutingContext rc) {
-        var queries = rc.request().getParam("queries");
-        var worlds = new Uni[parseQueryCount(queries)];
-        var ret = new World[worlds.length];
-        Arrays.setAll(worlds, i -> {
-            return randomWorld().map(w -> {
-                w.setRandomNumber(randomWorldNumber());
-                ret[i] = w;
-                return w;
-            });
-        });
-
-        Uni.combine().all().unis(worlds)
-        .combinedWith(v -> null)
-        .flatMap(v -> worldRepository.update(ret))
-        .map(v -> Arrays.asList(ret))
-        .subscribe().with(list -> sendJson(rc, list),
-                          t -> handleFail(rc, t));
+    @GET
+    public Uni<World> db(RoutingContext rc) {
+        return randomWorld();
     }
 
     private Uni<World> randomWorld() {
